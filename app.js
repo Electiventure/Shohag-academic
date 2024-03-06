@@ -1,8 +1,9 @@
 // app.js
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const methodOverride = require('method-override');
-const expressHandlebars = require('express-handlebars').create({ /* your configuration options here */ });
+const expressHandlebars = require('express-handlebars').create({});
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const session = require('express-session');
@@ -10,9 +11,9 @@ const User = require('./models/user'); // Create this model for user authenticat
 
 const app = express();
 
-// MongoDB connection (replace 'your-database-url' with your MongoDB URL)
-mongoose.connect('mongodb+srv://shohag:shohag@cluster0.y0v09il.mongodb.net/?retryWrites=true&w=majority', { useNewUrlParser: true, useUnifiedTopology: true });
-//mongoose.connect('mongodb://localhost:27017/your-database', { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect(process.env.MONGODB_URL)
+  .then(() => console.log('MongoDB Connected'))
+  .catch(err => console.log(err));
 
 // Middleware
 app.use(express.urlencoded({ extended: true }));
@@ -22,6 +23,9 @@ app.use(passport.session());
 
 // Method Override Middleware
 app.use(methodOverride('_method'));
+//Express Static Middleware
+app.use(express.static('public'));
+
 
 // Handlebars setup
 app.engine('handlebars', expressHandlebars.engine);
