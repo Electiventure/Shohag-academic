@@ -32,8 +32,8 @@ passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-// Include the 'Thing' model
-const Thing = require('./models/thing'); // Corrected lowercase 'thing' here
+// Include the 'Measurement' model
+const Measurement = require('./models/measurement'); // Corrected to 'Measurement' and lowercase 'measurement' here
 
 // Routes setup (to be implemented later)
 const indexRoutes = require('./routes/index');
