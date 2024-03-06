@@ -3,7 +3,7 @@ const express = require('express');
 const passport = require('passport');
 const router = express.Router();
 const User = require('../models/user');
-const Thing = require('../models/thing');
+const Measurement = require('../models/measurement');
 
 // Register
 router.get('/register', (req, res) => {
@@ -59,41 +59,30 @@ router.get('/', (req, res) => {
 
 // routes/index.js
 
-
-
-
-// CRUD operations for 'Thing' model
-// routes/index.js
-
-// ... (existing code)
-
-// CRUD operations for 'Thing' model
-router.get('/things', async (req, res) => {
+// CRUD operations for 'Measurement' model
+router.get('/measurements', async (req, res) => {
   try {
-      const things = await Thing.find({});
-      res.render('things/index', { things });
+      const measurements = await Measurement.find({});
+      res.render('measurements/index', { measurements });
   } catch (error) {
       console.error(error);
       res.status(500).send('Internal Server Error');
   }
 });
 
-router.get('/things/new', (req, res) => {
-  res.render('things/new');
+router.get('/measurements/new', (req, res) => {
+  res.render('measurements/new');
 });
 
-
-//Create new thing// Inside your POST route for creating a new 'Thing'
-router.post('/things', (req, res) => {
-  // Ensure required fields are provided in the request body
-  if (!req.body.thing.place || !req.body.thing.date || !req.body.thing.value || !req.body.thing.type) {
+//Create new measurement
+router.post('/measurements', (req, res) => {
+  if (!req.body.measurement.place || !req.body.measurement.date || !req.body.measurement.value || !req.body.measurement.type) {
     return res.status(400).send('All fields are required');
   }
 
-  // Create the 'Thing'
-  Thing.create(req.body.thing)
-    .then(newThing => {
-      res.redirect('/things');
+  Measurement.create(req.body.measurement)
+    .then(newMeasurement => {
+      res.redirect('/measurements');
     })
     .catch(err => {
       console.error(err);
@@ -101,48 +90,40 @@ router.post('/things', (req, res) => {
     });
 });
 
-
-
-
-// Read......!!
-router.get('/things/:id', async (req, res) => {
+router.get('/measurements/:id', async (req, res) => {
   try {
-      const foundThing = await Thing.findById(req.params.id);
-      res.render('things/show', { thing: foundThing });
+      const foundMeasurement = await Measurement.findById(req.params.id);
+      res.render('measurements/show', { measurement: foundMeasurement });
   } catch (error) {
       console.error(error);
       res.status(500).send('Internal Server Error');
   }
 });
 
-// Edit......!!
-router.get('/things/:id/edit', async (req, res) => {
+router.get('/measurements/:id/edit', async (req, res) => {
   try {
-      // Ensure req.params.id is properly handled
-      const foundThing = await Thing.findById(req.params.id);
-      res.render('things/edit', { thing: foundThing });
+      const foundMeasurement = await Measurement.findById(req.params.id);
+      res.render('measurements/edit', { measurement: foundMeasurement });
   } catch (error) {
       console.error(error);
       res.status(500).send('Internal Server Error');
   }
 });
 
-//Update
-router.put('/things/:id', async (req, res) => {
+router.put('/measurements/:id', async (req, res) => {
   try {
-      await Thing.findByIdAndUpdate(req.params.id, req.body.thing);
-      res.redirect('/things/' + req.params.id);
+      await Measurement.findByIdAndUpdate(req.params.id, req.body.measurement);
+      res.redirect('/measurements/' + req.params.id);
   } catch (error) {
       console.error(error);
       res.status(500).send('Internal Server Error');
   }
 });
 
-//Delete 
-router.delete('/things/:id', async (req, res) => {
+router.delete('/measurements/:id', async (req, res) => {
   try {
-      await Thing.findByIdAndRemove(req.params.id);
-      res.redirect('/things');
+      await Measurement.findByIdAndRemove(req.params.id);
+      res.redirect('/measurements');
   } catch (error) {
       console.error(error);
       res.status(500).send('Internal Server Error');
