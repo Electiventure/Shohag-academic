@@ -7,7 +7,7 @@ const expressHandlebars = require('express-handlebars').create({});
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const session = require('express-session');
-const User = require('./models/user'); // Create this model for user authentication
+const User = require('./models/user'); 
 
 const app = express();
 
@@ -18,11 +18,21 @@ mongoose.connect(process.env.MONGODB_URL)
 // Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(session({ secret: 'your-secret-key', resave: true, saveUninitialized: true }));
+
+// Passport middleware
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Custom Middleware to attach user state
+app.use(function(req, res, next) {
+  res.locals.isAuthenticated = req.isAuthenticated();
+  res.locals.user = req.user ? req.user : null;
+  next();
+});
+
 // Method Override Middleware
 app.use(methodOverride('_method'));
+
 //Express Static Middleware
 app.use(express.static('public'));
 

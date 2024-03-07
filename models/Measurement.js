@@ -24,10 +24,15 @@ const measurementSchema = new mongoose.Schema({
     required: true,
     trim: true,
   },
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: 'User'
+  }
 });
 
 // Create the 'Measurement' model based on the schema
 const Measurement = mongoose.model('Measurement', measurementSchema);
 
-// Export the 'Measurement' model for use in other parts of the application
+// Export the 'Measurement' model
 module.exports = Measurement;
