@@ -20,7 +20,6 @@
             </button>
             <div class="navbar-collapse collapse" id="navbarNav" style="">
                 <ul class="navbar-nav">                    
-                    <li class="nav-item"><a class="nav-link" href="/measurements/">Home</a></li>
                     {{#if user}}
                     <li class="nav-item"><a class="nav-link" href="/measurements/new">Add Measurement</a></li>
                     <li class="nav-item"><a class="nav-link" href="/measurements/show">View Measurements</a></li>
@@ -28,8 +27,8 @@
                     <li class="nav-item"><a class="nav-link" href="/measurements/edit">Update Measurement</a></li>
                     <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
                     {{else}}
-                    <li class="nav-item"><a class="nav-link" href="/users/login">Login</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/users/register">Register</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/login">Login</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/register">Register</a></li>
                     {{/if}}
                 </ul>
             </div>
