@@ -1,132 +1,59 @@
-// routes/index.js
+// index.js
 const express = require('express');
+const methodOverride = require('method-override');
+const expressHandlebars = require('express-handlebars').create({});
+const session = require('express-session');
 const passport = require('passport');
+const flash = require('connect-flash'); 
 const router = express.Router();
-const User = require('../models/user');
-const Measurement = require('../models/measurement');
+const passportConfig = require('../config/passport'); // Adjust the path as needed
+const bodyParser = require('body-parser');
 
-// Register
-router.get('/register', (req, res) => {
-  res.render('register');
+// Load environment variables using dotenv
+require('dotenv').config();
+
+const app = express();
+
+// Connect to MongoDB
+require("../config/mongoose");
+
+// Middleware
+app.use(express.urlencoded({ extended: true }));
+app.use(session({ secret: process.env.SESSION_SECRET, resave: true, saveUninitialized: false }));
+
+// Add body-parser middleware
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use(flash());
+
+// Passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(flash());
+
+// Custom Middleware to attach user state
+app.use(function(req, res, next) {
+    res.locals.isAuthenticated = req.isAuthenticated();
+    res.locals.user = req.user ? req.user : null;
+    next();
 });
+app.use(flash());
 
-router.post('/register', async (req, res) => {
-  try {
-      // Check if the username is already taken
-      const existingUser = await User.findOne({ username: req.body.username });
+// Method Override Middleware
+app.use(methodOverride('_method'));
 
-      if (existingUser) {
-          // User with the given username already exists
-          return res.status(400).send('Username is already taken');
-      }
+//Express Static Middleware
+app.use(express.static('public'));
 
-      // Continue with user registration
-      const user = new User({ username: req.body.username });
-      await user.setPassword(req.body.password);
-      await user.save();
+// Handlebars setup
+app.engine('handlebars', expressHandlebars.engine);
+app.set('view engine', 'handlebars');
 
-      // User registered successfully
-      res.redirect('/login');
-  } catch (error) {
-      // Handle errors, e.g., database error or registration error
-      console.error(error);
-      res.status(500).send('Internal Server Error');
-  }
-});
-
-// Login
-router.get('/login', (req, res) => {
-  res.render('login');
-});
-
-router.post('/login', passport.authenticate('local', {
-  successRedirect: '/',
-  failureRedirect: '/login',
-}), (req, res) => {});
-
-// Logout
-router.get('/logout', function(req, res) {
-  req.logout(function(err) {
-    if (err) { return next(err); }
-    res.redirect('/');
-  });
-});
+// Initialize passport with the configuration
+passportConfig(passport);
 
 // Home route
 router.get('/', (req, res) => {
-  res.render('index', { user: req.user });
+    res.render('index', { user: req.user });
 });
-
-// routes/index.js
-
-// CRUD operations for 'Measurement' model
-router.get('/measurements', async (req, res) => {
-  try {
-      const measurements = await Measurement.find({});
-      res.render('measurements/index', { measurements });
-  } catch (error) {
-      console.error(error);
-      res.status(500).send('Internal Server Error');
-  }
-});
-
-router.get('/measurements/new', (req, res) => {
-  res.render('measurements/new');
-});
-
-//Create new measurement
-router.post('/measurements', (req, res) => {
-  if (!req.body.measurement.place || !req.body.measurement.date || !req.body.measurement.value || !req.body.measurement.type) {
-    return res.status(400).send('All fields are required');
-  }
-
-  Measurement.create(req.body.measurement)
-    .then(newMeasurement => {
-      res.redirect('/measurements');
-    })
-    .catch(err => {
-      console.error(err);
-      res.status(500).send('Internal Server Error');
-    });
-});
-
-router.get('/measurements/:id', async (req, res) => {
-  try {
-      const foundMeasurement = await Measurement.findById(req.params.id);
-      res.render('measurements/show', { measurement: foundMeasurement });
-  } catch (error) {
-      console.error(error);
-      res.status(500).send('Internal Server Error');
-  }
-});
-
-router.get('/measurements/:id/edit', async (req, res) => {
-  try {
-      const foundMeasurement = await Measurement.findById(req.params.id);
-      res.render('measurements/edit', { measurement: foundMeasurement });
-  } catch (error) {
-      console.error(error);
-      res.status(500).send('Internal Server Error');
-  }
-});
-
-router.put('/measurements/:id', async (req, res) => {
-  try {
-      await Measurement.findByIdAndUpdate(req.params.id, req.body.measurement);
-      res.redirect('/measurements/' + req.params.id);
-  } catch (error) {
-      console.error(error);
-      res.status(500).send('Internal Server Error');
-  }
-});
-
-router.delete('/measurements/:id', async (req, res) => {
-  try {
-      await Measurement.findByIdAndRemove(req.params.id);
-      res.redirect('/measurements');
-  } catch (error) {
-      console.error(error);
-      res.status(500).send('Internal Server Error');
-  }
-})
 module.exports = router;

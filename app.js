@@ -1,60 +1,30 @@
 // app.js
-require('dotenv').config();
 const express = require('express');
-const mongoose = require('mongoose');
-const methodOverride = require('method-override');
-const expressHandlebars = require('express-handlebars').create({});
-const passport = require('passport');
-const LocalStrategy = require('passport-local').Strategy;
-const session = require('express-session');
-const User = require('./models/user'); 
-
 const app = express();
+const expressHandlebars = require('express-handlebars').create({});
 
-mongoose.connect(process.env.MONGODB_URL)
-  .then(() => console.log('MongoDB Connected'))
-  .catch(err => console.log(err));
-
-// Middleware
-app.use(express.urlencoded({ extended: true }));
-app.use(session({ secret: 'your-secret-key', resave: true, saveUninitialized: true }));
-
-// Passport middleware
-app.use(passport.initialize());
-app.use(passport.session());
-
-// Custom Middleware to attach user state
-app.use(function(req, res, next) {
-  res.locals.isAuthenticated = req.isAuthenticated();
-  res.locals.user = req.user ? req.user : null;
-  next();
-});
-
-// Method Override Middleware
-app.use(methodOverride('_method'));
-
-//Express Static Middleware
-app.use(express.static('public'));
-
+// Load environment variables using dotenv
+require('dotenv').config();
 
 // Handlebars setup
 app.engine('handlebars', expressHandlebars.engine);
 app.set('view engine', 'handlebars');
 
-// Passport Configuration
-passport.use(new LocalStrategy(User.authenticate()));
-passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.deserializeUser());
+//Express Static Middleware
+app.use(express.static('public'));
 
-// Include the 'Measurement' model
-const Measurement = require('./models/measurement'); // Corrected to 'Measurement' and lowercase 'measurement' here
-
-// Routes setup (to be implemented later)
+// Routes setup 
 const indexRoutes = require('./routes/index');
 app.use('/', indexRoutes);
+
+const usersRoutes = require('./routes/users');
+app.use('/users', usersRoutes);
+
+const measurementsRoutes = require('./routes/measurements');
+app.use('/measurements', measurementsRoutes);
 
 // Server setup
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+    console.log(`Server is running on port ${PORT}`);
 });

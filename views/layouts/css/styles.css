@@ -1,0 +1,19 @@
+body {
+  display: grid;
+  grid-template-areas: 
+      "header header header"
+      "nav content aside"
+      "footer footer footer";
+  grid-template-columns: 1fr 3fr 1fr;
+}
+
+header, nav, article, aside, footer {
+  padding: 20px;
+  border: 1px solid #ccc;
+}
+
+header { grid-area: header; }
+nav { grid-area: nav; }
+article { grid-area: content; }
+aside { grid-area: aside; }
+footer { grid-area: footer; }

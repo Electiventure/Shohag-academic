@@ -1,22 +1,20 @@
-// models/user.js
+//models\User.js
 const mongoose = require('mongoose');
 const passportLocalMongoose = require('passport-local-mongoose');
 
 // Define the 'User' schema
 const UserSchema = new mongoose.Schema({
-    username: {
-      type: String,
-      required: [true, 'Username is required'],
-      unique: true,
+  username: {
+    type: String,
+    required: true,
   },
   password: {
     type: String,
-    required: [true, 'Password is required'] 
   }
-  });
+});
 
-// Plugin Passport-Local Mongoose to simplify username/password management
-UserSchema.plugin(passportLocalMongoose);
+// Plugin Passport-Local Mongoose with the 'usernameField' option
+UserSchema.plugin(passportLocalMongoose, { usernameField: 'username' });
 
 // Create the 'User' model based on the schema
 const User = mongoose.model('User', UserSchema);
