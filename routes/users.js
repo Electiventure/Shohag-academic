@@ -1,22 +1,17 @@
 //routes/users.js
 const express = require('express');
 const router = express.Router();
-const registerController = require('../controllers/registerController.js');
-const loginController = require('../controllers/loginController.js');
-const auth = require('../config/auth.js');
+
+const {registerPost,loginPost,logout} = require('../controllers/userController');
+const { restrictToLoggedinUserOnly } = require("../middlewares/auth");
 
 // Register
-router.get('/register', registerController.registerGet);
-router.post('/register', registerController.registerPost);
+router.post('/register', registerPost);
 
 // Login
-router.get('/login', loginController.loginGet);
-router.post('/login', loginController.loginPost);
+router.post('/login', loginPost);
 
-//Dashboard after login
-router.get('/dashboard', auth.ensureAuthenticated, loginController.dashboardGet);
-
-// Logout
-router.get('/logout', loginController.logout);
+// Logout route
+router.get("/logout", restrictToLoggedinUserOnly, logout);
 
 module.exports = router;
