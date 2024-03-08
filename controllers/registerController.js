@@ -1,3 +1,4 @@
+//controllers\registerController.js
 const User = require('../models/User');
 
 const registerGet = (req, res) => {
